@@ -1,0 +1,35 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Compile Java
+      run: |
+        mkdir out
+        javac src/*.java -d out
+
+    - name: Package JAR
+      run: |
+        jar cfe ForgeClicker.jar AutoClickerGUI -C out .
+
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ForgeClicker.jar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
